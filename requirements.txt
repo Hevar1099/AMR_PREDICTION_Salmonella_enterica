@@ -1,0 +1,27 @@
+# Data Processing & ML
+pandas==2.3.3
+numpy==2.2.6
+scipy==1.15.2
+scikit-learn==1.7.2
+xgboost==3.1.3
+joblib==1.5.3
+
+# Visualization
+matplotlib==3.10.8
+seaborn==0.13.2
+squarify==0.4.3
+shap==0.48.0
+cycler==0.12.1
+
+# Bioinformatics & Hashing
+mmh3==5.2.0
+biopython==1.79
+
+
+# install_R_dependencies.R
+install.packages("circlize", repos = "http://cran.us.r-project.org")
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager", repos = "http://cran.us.r-project.org")
+
+BiocManager::install("ComplexHeatmap")

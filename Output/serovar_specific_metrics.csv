@@ -1,0 +1,7 @@
+Serovar,Total Samples,Lineage-Specific Error Rate (%),Recall (Sensitivity),Precision (Positive Predictive Value),Calibration Error (Brier Score)
+Enteritidis,111,0.0,1.0,1.0,6.4437060983013164e-06
+Uganda,18,0.0,0.0,0.0,9.837198994235787e-06
+Worthington,7,0.0,0.0,0.0,9.358976077994827e-06
+Heidelberg,112,0.0,0.0,0.0,1.729821081596217e-05
+Montevideo,29,0.0,0.0,0.0,0.00038281565368316614
+Hadar,84,0.0,0.0,0.0,5.014473532644446e-06
