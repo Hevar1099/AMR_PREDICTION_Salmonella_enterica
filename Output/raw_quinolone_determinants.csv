@@ -1,0 +1,14 @@
+Determinant,Total_Present,Prevalence_Pct,Variance,Resistant_With_Det,Retained_In_22
+gyrA_D87Y,476,5.434,0.0514,474,True
+qnrB19,26,0.297,0.00296,16,False
+gyrA_S83F,12,0.137,0.00137,11,False
+qnrS1,10,0.114,0.00114,4,False
+gyrA_D87G,3,0.034,0.00034,2,False
+gyrA_S83Y,3,0.034,0.00034,3,False
+parC_S80I,2,0.023,0.00023,2,False
+qnrS2,2,0.023,0.00023,2,False
+aac(6')-Ib-cr5,1,0.011,0.00011,1,False
+gyrA_D82N,1,0.011,0.00011,0,False
+qnrA1,1,0.011,0.00011,1,False
+qnrB,1,0.011,0.00011,1,False
+qnrB1,1,0.011,0.00011,1,False
