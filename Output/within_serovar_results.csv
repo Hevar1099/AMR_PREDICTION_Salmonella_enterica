@@ -1,0 +1,22 @@
+Analysis,Serovar,Model,N,R,S,ROC_AUC,PR_AUC,F1,TP,FN,FP,TN
+Main_Test_Set_Within_Serovar,Infantis,RF,108,80,28,1.0,1.0,1.0,80,0,0,28
+Main_Test_Set_Within_Serovar,Infantis,LR,108,80,28,1.0,1.0,1.0,80,0,0,28
+Main_Test_Set_Within_Serovar,Infantis,XGB,108,80,28,1.0,1.0,1.0,80,0,0,28
+Main_Test_Set_Within_Serovar,Enteritidis,RF,111,7,104,1.0,1.0,1.0,7,0,0,104
+Main_Test_Set_Within_Serovar,Enteritidis,LR,111,7,104,1.0,1.0,1.0,7,0,0,104
+Main_Test_Set_Within_Serovar,Enteritidis,XGB,111,7,104,1.0,1.0,1.0,7,0,0,104
+Main_Test_Set_Within_Serovar,Monophasic Variant,RF,107,3,104,0.9391,0.4242,0.5,1,2,0,104
+Main_Test_Set_Within_Serovar,Monophasic Variant,LR,107,3,104,0.9135,0.4103,0.5,1,2,0,104
+Main_Test_Set_Within_Serovar,Monophasic Variant,XGB,107,3,104,0.8878,0.3874,0.5,1,2,0,104
+Within_Serovar_5Fold_CV,Infantis,LR,536,414,122,0.9995,0.9998,0.9988,414,0,1,121
+Within_Serovar_5Fold_CV,Infantis,RF,536,414,122,0.9957,0.9975,0.9976,413,1,1,121
+Within_Serovar_5Fold_CV,Infantis,XGB,536,414,122,0.997,0.9986,0.9988,414,0,1,121
+Within_Serovar_5Fold_CV,Enteritidis,LR,646,45,601,0.9652,0.959,0.9773,43,2,0,601
+Within_Serovar_5Fold_CV,Enteritidis,RF,646,45,601,0.9654,0.9591,0.9773,43,2,0,601
+Within_Serovar_5Fold_CV,Enteritidis,XGB,646,45,601,0.9644,0.9587,0.9773,43,2,0,601
+Within_Serovar_5Fold_CV,Monophasic Variant,LR,470,23,447,0.9207,0.707,0.5085,15,8,21,426
+Within_Serovar_5Fold_CV,Monophasic Variant,RF,470,23,447,0.907,0.6676,0.5091,14,9,18,429
+Within_Serovar_5Fold_CV,Monophasic Variant,XGB,470,23,447,0.9164,0.7054,0.3797,15,8,41,406
+Within_Infantis_Genotype_Grouped_5Fold,Infantis,LR,536,414,122,0.9995,0.9998,0.9853,403,11,1,121
+Within_Infantis_Genotype_Grouped_5Fold,Infantis,RF,536,414,122,0.9955,0.9974,0.9976,413,1,1,121
+Within_Infantis_Genotype_Grouped_5Fold,Infantis,XGB,536,414,122,0.9941,0.9965,0.9988,414,0,1,121
