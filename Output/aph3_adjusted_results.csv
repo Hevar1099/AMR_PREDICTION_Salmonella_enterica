@@ -1,0 +1,8 @@
+Scope,N,Gene_Pos_R,Gene_Pos_S,Gene_Neg_R,Gene_Neg_S,R_Pct_Gene_Pos,R_Pct_Gene_Neg,Odds_Ratio,P_Value
+Overall_Unadjusted,8759,14,2511,497,5737,0.55,7.97,0.0644,9.953e-57
+Within_Infantis,536,0,15,414,107,0.0,79.46,0.0,1.133e-10
+Within_Enteritidis,646,0,10,45,591,0.0,7.08,0.0,1.0
+Within_Monophasic Variant,470,4,83,19,364,4.6,4.96,0.9233,1.0
+Within_Kentucky,1501,1,1187,1,312,0.08,0.32,0.2628,0.3737
+Within_Saintpaul,415,0,21,5,389,0.0,1.27,0.0,1.0
+Within_Senftenberg,153,1,39,4,109,2.5,3.54,0.6987,1.0
