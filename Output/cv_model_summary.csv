@@ -1,0 +1,7 @@
+Model,Mean,SD,Min,Max
+LR_Calibrated,0.8143,0.2492,0.39,0.9863
+LR_Uncalibrated,0.9091,0.0872,0.7721,0.9869
+RF_Calibrated,0.9186,0.0835,0.7773,0.987
+RF_Uncalibrated,0.9185,0.0846,0.7749,0.987
+XGB_Calibrated,0.9085,0.108,0.7225,0.9859
+XGB_Uncalibrated,0.9255,0.0762,0.7984,0.9861
