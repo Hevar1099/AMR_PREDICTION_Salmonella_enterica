@@ -1,160 +1,157 @@
-# Antimicrobial Resistance (AMR) Prediction via Genomic Machine Learning
+# Beyond the Black Box: Ciprofloxacin Resistance Prediction in *Salmonella enterica*
 
-[![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10.19-blue.svg)](https://www.python.org/)
 [![R](https://img.shields.io/badge/R-4.0%2B-blue.svg)](https://www.r-project.org/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-3.1.3-orange.svg)](https://xgboost.readthedocs.io/)
 [![KMC3](https://img.shields.io/badge/KMC-3.2.4-green.svg)](https://github.com/refresh-bio/KMC)
 
-## Project Overview
-This repository contains a comprehensive, highly optimized machine learning pipeline for predicting Antimicrobial Resistance (AMR)—specifically Ciprofloxacin resistance—from bacterial genomic data. 
-To ensure rigorous clinical relevance and prevent lineage-memorization, the pipeline features:
-
-* **Dual Feature Modalities:** Supports both curated AMR gene presence/absence matrices and highly parallelized, hashed *k*-mer frequencies.
-* **Lineage-Aware Filtering:** Statistically isolates and removes highly correlated lineage markers that do not drive true resistance.
-* **Clinical Evaluation Metrics:** Evaluates models using standard ML metrics alongside clinical microbiology standards (Very Major Errors, Major Errors, Isotonic Calibration, and Decision Curve Analysis).
-* **Interpretability & Visualization:** Utilizes SHAP values for forensic failure analysis and incorporates advanced R-based visualizations (ComplexHeatmap) to map predictive features to clinical phenotypes.
+Code, curated datasets, trained models, and audit outputs for *"Beyond the Black Box: A Calibrated, Gene-Centric Pipeline for High-Precision Ciprofloxacin Resistance Prediction in Salmonella enterica"*. This repository compares an alignment-free 31-mer MurmurHash3 ($2^{24}$) pipeline against curated 22-gene machine learning models (Logistic Regression, Random Forest, and XGBoost) across 8,759 *Salmonella enterica* isolates (511 resistant, 8,248 susceptible) from the NCBI Pathogen Detection database, including isotonic probability calibration, SHAP interpretability, Leave-One-Serovar-Out (LOSO) validation, and population-structure sensitivity audits.
 
 ---
 
-## Repository Structure
+## Directory Structure
 
 ```text
-├── Data/                          
-│   ├── accessions.txt
-│   ├── accessions_list.txt
-│   ├── accessions_clean.txt       # Use this to fetch the NCBI genomes
-│   ├── cleaned_metadata.csv
-│   ├── dna_file_paths.csv
-│   ├── final_ml_dataset.csv
-│   ├── metadata.tsv
-│   ├── test_set.csv
-│   ├── train_set.csv
-│   ├── X_kmer_matrix.npz
-│   └── y_kmer_labels.csv
-├── Documentation/                 # Supplementary project documentation
-├── Scripts/                       # Core pipeline scripts (Python & R)
-│   ├── main_script.py
-│   ├── Cleaning_genome.py
-│   ├── file_kmers.py
-│   ├── Kmers_counting.py
-│   ├── kmc_worker.py
-│   ├── hashing_collision.py
-│   ├── train_kmer_model.py
-│   ├── ML_testing.py
-│   ├── serovar_metrics.py
-│   ├── Cross_over_validation.py
-│   ├── data_viz_python.py
-│   └── data_viz_R.R
-├── Output/                        # Generated models, metrics, and publication figures
-│   ├── best_lr_model.pkl
-│   ├── best_rf_model.pkl
-│   ├── best_xgb_model.pkl
-│   ├── feature_importance.png
-│   ├── Figure1_Serovar_Treemap.png
-│   ├── Figure2_Performance_Curves.png
-│   ├── Figure3_CV_Stability.png
-│   ├── Figure4_OncoPrint.pdf
-│   ├── Figure5_SHAP_Summary.png
-│   ├── Figure7_Failure_Heatmap.png
-│   ├── Figure8_Calibration.png
-│   ├── Figure9_Stability_Decay.png
-│   ├── Figure11_DCA.png
-│   ├── loso_performance.png
-│   ├── loso_results.csv
-│   ├── metadata_for_heatmap.csv
-│   ├── model_calibration_comparison.csv
-│   ├── model_comparison.csv
-│   ├── serovar_specific_metrics.csv
-│   ├── Table1_demographics.csv
-│   ├── test_indices.npy
-│   └── top_genes_matrix.csv
-├── environment.yml                # Conda environment configuration
-├── requirements.txt               # Standard Python dependencies
+.
+├── Data/                         # Curated metadata, accession lists, and ML matrices
+│   ├── accessions_clean.txt      # Final NCBI Assembly accessions (N = 8,759)
+│   ├── cleaned_metadata.csv      # Cleaned metadata with standardized serovar names
+│   ├── final_ml_dataset.csv      # Curated 22-gene binary feature matrix + labels
+│   ├── metadata.tsv              # Raw NCBI Pathogen Detection export (retrieved Jan 17, 2026)
+│   ├── train_set.csv             # Stratified 80% training split (N = 7,008)
+│   ├── test_set.csv              # Stratified 20% test split (N = 1,751)
+│   ├── X_kmer_matrix.npz         # Sparse hashed 31-mer feature matrix (2^24 space)
+│   └── y_kmer_labels.csv         # Binary labels aligned to X_kmer_matrix.npz
+├── Script/                       # Core pipeline, plotting, and statistical audit scripts
+├── Output/                       # Saved models (.pkl), tables (.csv), and figures (.png/.pdf)
+├── environment.yml               # Conda environment specification
+├── requirements.txt              # Pinned Python dependencies + R package install lines
 └── README.md
 ```
 
 ---
 
-## Prerequisites & Setup
+## Environment & Installation
 
-This project uses a mix of Python, R, and external bioinformatics tools (KMC3). The easiest and most reproducible way to set up the environment is using the provided Conda `environment.yml` file.
+All analyses were run with **Python 3.10.19** and fixed random seed `42` using pinned package versions (`pandas==2.3.3`, `numpy==2.2.6`, `scipy==1.15.2`, `statsmodels==0.15.0`, `scikit-learn==1.7.2`, `xgboost==3.1.3`, `joblib==1.5.3`, `shap==0.48.0`, `mmh3==5.2.0`, `matplotlib==3.10.8`, `seaborn==0.13.2`, `squarify==0.4.3`). R (`ComplexHeatmap`, `circlize`) is only required to regenerate the OncoPrint figure (`Figure4_OncoPrint.pdf`), and KMC3 (`3.2.4`) is only required if re-extracting 31-mers from raw assemblies.
 
-### Option 1: Conda Environment (Recommended)
-This will install Python, R, all required libraries, and KMC3 in one go.
+### Option 1: Conda (Recommended)
+
 ```bash
+git clone https://github.com/Hevar1099/AMR_PREDICTION_Salmonella_enterica.git
+cd AMR_PREDICTION_Salmonella_enterica
 conda env create -f environment.yml
 conda activate amr_project
 ```
 
-### Option 2: Standard Pip & R Installation
-If you prefer not to use Conda for the entire environment, you can install the dependencies manually:
+### Option 2: Pip + R + KMC3
 
-1. **Python Dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. **KMC3:** Must be installed and accessible in your system's PATH.
-   ```bash
-   conda install -c bioconda kmc
-   ```
-3. **R Dependencies:** Open R and run:
-   ```R
-   install.packages("circlize")
-   if (!requireNamespace("BiocManager", quietly = TRUE))
-       install.packages("BiocManager")
-   BiocManager::install("ComplexHeatmap")
-   ```
+```bash
+git clone https://github.com/Hevar1099/AMR_PREDICTION_Salmonella_enterica.git
+cd AMR_PREDICTION_Salmonella_enterica
+pip install -r requirements.txt
+```
 
----
+If regenerating the OncoPrint in R:
 
-## Data Retrieval Protocol
-To adhere to GitHub file size limits and ensure reproducibility, raw genome sequences are not hosted in this repository. 
+```r
+install.packages("circlize")
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install("ComplexHeatmap")
+```
 
-1. Run `Scripts/main_script.py` (Phase 1) to generate the clean accession lists.
-2. Use the NCBI Datasets CLI to download the raw bacterial assemblies:
-   ```bash
-   datasets download genome accession --inputfile Data/accessions_clean.txt --filename genomes.zip
-   unzip genomes.zip -d Data/Genome/ncbi_dataset/data/
-   ```
+If re-extracting k-mers from raw genome assemblies:
+
+```bash
+conda install -c bioconda kmc
+```
 
 ---
 
-## Execution Pipeline
+## Quick Start
 
-### Phase 1: Data Preparation & Gene Feature Engineering
-**1. Metadata Preprocessing (`main_script.py`)**
-* Cleans raw NCBI metadata (`metadata.tsv`), calculates antibiotic frequencies, isolates Ciprofloxacin phenotypes (R/S), and one-hot encodes AMR genotypes.
+All scripts use relative paths (`Data/...`, `Output/...`) and should be run from the repository root. To verify the environment and reproduce the primary test-set metrics and paired DeLong tests on the included dataset (`N = 1,751`; 100 resistant, 1,651 susceptible):
 
-**2. Lineage Filtering (`Cleaning_genome.py`)**
-* Standardizes serovar nomenclature and performs strict feature selection by dropping low-variance genes and lineage markers (>95% prevalence) lacking true resistance correlation.
+```bash
+python Script/test_set_full_metrics.py
+```
 
-### Phase 2: Agnostic *K*-mer Extraction
-**3. Genome Mapping (`file_kmers.py`)**
-* Scans the downloaded NCBI genomes and maps `.fna` file paths to target Assembly IDs.
+Expected outputs:
+- `Output/test_set_full_metrics.csv` — Accuracy, precision, recall, specificity, F1, ROC AUC, PR-AUC (with 1,000-iteration bootstrap 95% CIs), VME%, ME%, and raw TP/FN/FP/TN counts for all uncalibrated and calibrated models.
+- `Output/delong_comparisons.csv` — Pairwise DeLong test $z$-statistics and $p$-values across models.
 
-**4. High-Performance *K*-mer Extraction (`Kmers_counting.py` & `kmc_worker.py`)**
-* Dynamically spins up CPU workers to run KMC3. Uses the MurmurHash3 "Hashing Trick" to map 31-mers to a fixed-size (16.7M) memory-efficient SciPy CSR sparse matrix.
+---
 
-**5. Hashing Vector Audit (`hashing_collision.py`)**
-* A theoretical quality-control script to calculate the collision probability of the feature hashing trick based on unique dataset *k*-mers.
+## Data Provenance & Retrieval
 
-### Phase 3: Model Training & Stability Auditing
-**6. *K*-mer Stability Auditing (`train_kmer_model.py`)**
-* Uses L1-penalized Stability Selection to isolate the most robust *k*-mers. Compares feature stability decay directly against the gene model and trains an ElasticNet classifier evaluated on clinical VME limits. Outputs `Figure9_Stability_Decay.png`.
+- **Source:** [NCBI Pathogen Detection](https://www.ncbi.nlm.nih.gov/pathogens/) *Salmonella enterica* Isolates Browser export, retrieved **January 17, 2026** (`Data/metadata.tsv`, 9,857 initial records).
+- **Filtering:** Excluding 299 non-binary/missing ciprofloxacin AST records (123 I, 151 NS, 24 missing, 1 ND), 201 missing assembly accessions, and 598 missing/unknown serovars yields **8,759 isolates** (511 resistant [5.83%], 8,248 susceptible [94.17%]) across 93 serovars (`Data/final_ml_dataset.csv`).
+- **Raw Genome Assemblies:** Not hosted in this repository due to size limits. To download the exact assemblies used for the k-mer audit via the NCBI Datasets CLI:
 
-**7. Gene Model Training & Rigorous Testing (`ML_testing.py`)**
-* Tunes XGBoost, Random Forest, and Logistic Regression on curated AMR genes. Performs Isotonic Calibration and evaluates standard (ROC AUC) and clinical metrics (Brier Score, ME%, VME%). Performs Blocked Cross-Validation.
+```bash
+datasets download genome accession --inputfile Data/accessions_clean.txt --filename genomes.zip
+unzip genomes.zip -d Data/Genome/ncbi_dataset/data/
+```
 
-### Phase 4: Clinical Validation & Out-of-Lineage Generalization
-**8. Serovar-Specific Granularity (`serovar_metrics.py`)**
-* Evaluates the calibrated model's performance on high-interest clinical lineages (*Enteritidis*, *Heidelberg*, etc.) utilizing strict test-set indices (`test_indices.npy`).
+---
 
-**9. Out-of-Lineage Generalization (`Cross_over_validation.py`)**
-* Performs Leave-One-Serovar-Out (LOSO) cross-validation and calculates genetic Jaccard distances to prove the model identifies core resistance mechanisms rather than memorizing lineage patterns.
+## Reproducing Paper Results
 
-### Phase 5: Visualization & Interpretability
-**10. Publication Figures & SHAP Analysis (`data_viz_python.py`)**
-* Generates publication-ready demographics tables, Treemaps, and ROC/PR curves. Features an advanced "Forensic Failure Heatmap" clustering misclassified samples based on their SHAP profiles. Exports data for R plotting.
+Run commands from the repository root in the order below (or run individual audit scripts directly using the pre-built `Data/final_ml_dataset.csv` and saved models in `Output/`).
 
-**11. Complex Heatmap Generation (`data_viz_R.R`)**
-* Reads the exported python matrices into R to generate a publication-ready annotated `ComplexHeatmap` (`Figure4_OncoPrint.pdf`), applying hierarchical clustering to map phenotypic resistance against predictive AMR features.
+### Core Pipeline
+
+| Stage | Command | Key Outputs |
+| :--- | :--- | :--- |
+| 1. Metadata cleaning & phenotype extraction | `python Script/main_script.py` | `Data/cleaned_metadata.csv`, `Data/accessions_clean.txt` |
+| 2. Gene feature engineering & lineage filter | `python Script/Cleaning_genome.py` | `Data/final_ml_dataset.csv` (22 features) |
+| 3. Hashing collision & memory audit | `python Script/hashing_collsion.py` | Console collision, occupancy, and memory report |
+| 4. K-mer stability audit (requires `X_kmer_matrix.npz`) | `python Script/agnostic_kmer_stability_audit.py` | `Output/Figure9_Stability_Decay.png` |
+| 5. Model training, HPO, calibration & DCA | `python Script/ML_testing.py` | `Output/best_*_model.pkl`, `Output/Figure8_Calibration.png`, `Output/Figure11_DCA.png` |
+| 6. Serovar-specific metrics (Table 5) | `python Script/serovar_metrics.py` | `Output/serovar_specific_metrics.csv` |
+| 7. LOSO validation & plot (Figure 8) | `python Script/Cross_over_validation.py` | `Output/loso_results.csv`, `Output/loso_performance.png` |
+| 8. Figures 1, 2, 6, 7, 10 & R export | `python Script/data_viz_python.py` | `Output/Figure1_Serovar_Treemap.png`, `Figure2_Performance_Curves.png`, `Figure3_CV_Stability.png`, `Figure5_SHAP_Summary.png`, `Figure7_Failure_Heatmap.png` |
+| 9. OncoPrint (Figure 9) | `Rscript Script/data_viz_R.R` | `Output/Figure4_OncoPrint.pdf` |
+
+---
+
+## Validation & Sensitivity Audits
+
+Each script below runs independently from the repository root on `Data/final_ml_dataset.csv` (and `Data/cleaned_metadata.csv` where raw annotations are audited) to verify the statistical checks reported in the manuscript:
+
+| Audit | Command | Output File(s) |
+| :--- | :--- | :--- |
+| Test-set metrics, bootstrap 95% CIs & DeLong tests | `python Script/test_set_full_metrics.py` | `Output/test_set_full_metrics.csv`, `Output/delong_comparisons.csv` |
+| Calibration-in-the-large, slope & bin counts | `python Script/calibration_metrics.py` | `Output/calibration_diagnostics.csv`, `Output/calibration_bin_counts.csv` |
+| Genotype-clustered & serovar-grouped 5-fold CV | `python Script/grouped_split_validation.py` | `Output/grouped_split_results.csv` |
+| Within-serovar 5-fold & genotype-grouped CV | `python Script/within_serovar_validation.py` | `Output/within_serovar_results.csv` |
+| SHAP stability, gain vs. SHAP & raw QRDR audit | `python Script/shap_stability_check.py` | `Output/shap_stability_summary.csv`, `Output/raw_quinolone_determinants.csv` |
+| Serovar- & `gyrA_D87Y`-adjusted `aph(3'')-Ib` analysis | `python Script/aph3_adjusted_analysis.py` | `Output/aph3_adjusted_results.csv` |
+| 5-fold GroupKFold composition & Fold 1 outlier audit | `python Script/cv_fold_audit.py` | `Output/cv_fold_composition.csv`, `Output/cv_model_summary.csv` |
+| Full 93-serovar LOSO audit, CIs & AUC < 0.5 diagnostics | `python Script/loso_full_audit.py` | `Output/loso_full_audit.csv`, `Output/loso_low_auc_diagnostics.csv` |
+
+---
+
+## Citation
+
+If you use this code or curated dataset, please cite:
+
+```bibtex
+@article{barznji2026beyond,
+  author  = {Barznji, Hevar N.},
+  title   = {Beyond the Black Box: A Calibrated, Gene-Centric Pipeline for High-Precision Ciprofloxacin Resistance Prediction in Salmonella enterica},
+  journal = {Journal of Microbiological Methods},
+  year    = {2026},
+  note    = {Manuscript under revision},
+  url     = {https://github.com/Hevar1099/AMR_PREDICTION_Salmonella_enterica}
+}
+```
+
+---
+
+## Funding, Issues & Contact
+
+- **Author & Maintainer:** Hevar N. Barznji, Medical Laboratory Science Department, Charmo University, Sulaymaniyah, Iraq (`hivar.neyaz@chu.edu.iq`).
+- **Funding:** This research received no external funding from public, commercial, or not-for-profit agencies.
+- **Issues:** Please report bugs or reproducibility questions via [GitHub Issues](https://github.com/Hevar1099/AMR_PREDICTION_Salmonella_enterica/issues).
+- **Data & Code Reuse:** Underlying isolate metadata are public domain via NCBI Pathogen Detection. Please contact the author regarding reuse permissions if a license file has not yet been added to this repository.
